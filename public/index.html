@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Loja</title>
+</head>
+<body>
+    <header>
+      <h1 class="titulo">Faça seu pedido!</h1>
+    </header>
+    
+    <div class="product">
+    <img src="img/Produto 1.png" alt="Imagem do Produto" class="produto_imagem">
+    <div>
+      <h2>Produto 1</h2>
+      <div class="controls">
+        <button onclick="updateQuantity('produto_1', -1)">-</button>
+        <input type="number" id="produto_1" value="0" min="0">
+        <button onclick="updateQuantity('produto_1', 1)">+</button>
+      </div>
+    </div>
+        
+    </div>
+    <div class="product">
+      <img src="img/Produto 2.png" alt="Imagem do Produto" class="produto_imagem">
+      <div>
+        <h2>Produto 2</h2>
+        <div class="controls">
+          <button onclick="updateQuantity('produto_2', -1)">-</button>
+          <input type="number" id="produto_2" value="0" min="0">
+          <button onclick="updateQuantity('produto_2', 1)">+</button>
+        </div>
+      </div>
+        
+    </div>
+    <div class="product">
+      <img src="img/Produto 3.png" alt="Imagem do Produto" class="produto_imagem">
+      <div>
+        <h2>Produto 3</h2>
+        <div class="controls">
+          <button onclick="updateQuantity('produto_3', -1)">-</button>
+          <input type="number" id="produto_3" value="0" min="0">
+          <button onclick="updateQuantity('produto_3', 1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="product">
+      <img src="img/Produto 4.png" alt="Imagem do Produto" class="produto_imagem">
+      <div>
+        <h2>Produto 4</h2>
+        <div class="controls">
+          <button onclick="updateQuantity('produto_4', -1)">-</button>
+          <input type="number" id="produto_4" value="0" min="0">
+          <button onclick="updateQuantity('produto_4', 1)">+</button>
+        </div>
+        </div>
+    </div>
+
+    <button id="submit" onclick="sendOrder()">Enviar Pedido</button>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const socket = io('http://192.168.100.34:3000');
+
+        // Receber status do pedido quando estiver pronto
+        socket.on('orderStatus', (data) => {
+            alert(data.status);
+        });
+
+        // Função para enviar o pedido
+        function sendOrder() {
+            const products = ["produto_1", "produto_2", "produto_3", "produto_4"];
+            const order = products.map(product => {
+                const quantity = parseInt(document.getElementById(product).value) || 0;
+                return { product, quantity };
+            }).filter(item => item.quantity > 0); // Filtra apenas os itens com quantidade > 0
+
+            if (order.length === 0) {
+                alert("Por favor, selecione pelo menos um item antes de enviar o pedido!");
+                return;
+            }
+
+            // Enviar o pedido para o servidor via WebSocket, incluindo o clientId
+            socket.emit('sendOrder', { items: order, clientId: socket.id });
+            alert("Pedido enviado com sucesso!");
+        }
+
+        // Função para aumentar ou diminuir a quantidade do pedido
+        function updateQuantity(productId, change) {
+            const input = document.getElementById(productId);
+            let currentValue = parseInt(input.value) || 0;
+            currentValue += change;
+            if (currentValue < 0) currentValue = 0;
+            input.value = currentValue;
+        }
+    </script>
+</body>
+</html>

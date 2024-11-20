@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel da Empresa</title>
+</head>
+<body>
+    <h1>Painel da Empresa</h1>
+    <h2>Pedidos Recebidos</h2>
+    <ul id="ordersList"></ul>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const socket = io('http://localhost:3000');
+
+        var clientNum = 1;
+        
+        // Recebe pedidos em tempo real
+        socket.on('newOrder', (order) => {
+            const ordersList = document.getElementById('ordersList');
+            const orderDetails = order.items.map(item => `${item.quantity}x ${item.product}`).join(', ');
+
+            const li = document.createElement('li');
+            li.textContent = `Pedido do Cliente ${clientNum}: ${orderDetails}`;
+
+            // Botão para marcar como pronto
+            const button = document.createElement('button');
+            button.textContent = 'Marcar como pronto';
+            button.classList.add(clientNum);
+            
+            // Ao clicar no botão, envia uma mensagem para o servidor indicando que o pedido está pronto
+            button.onclick = () => {
+                socket.emit('orderReady', { clientId: order.clientId });
+                alert(`Pedido do Cliente ${button.classList[0]} marcado como pronto!`);
+                ordersList.removeChild(li);
+            };
+            
+            li.appendChild(button);
+            ordersList.appendChild(li);
+            clientNum++;
+        });
+    </script>
+</body>
+</html>
