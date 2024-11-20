@@ -11,7 +11,7 @@ app.use(express.static('public'));
 
 // Inicializa o servidor na porta 3000
 server.listen(3000, () => {
-    console.log('Servidor rodando em http://localhost:3000');
+    console.log('Servidor rodando em http://192.168.100.34:3000');
 });
 
 // Gerenciar conexões via WebSocket
