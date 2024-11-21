@@ -1,5 +1,5 @@
 // Conectando ao servidor WebSocket
-const socket = io('http://192.168.100.34:3000'); // Substitua pelo domínio do servidor em produção
+const socket = io('http://192.168.240.10:3000'); // Substitua pelo domínio do servidor em produção
 
 // Função para atualizar a quantidade de um produto
 function updateQuantity(productId, change) {
